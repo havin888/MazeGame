@@ -79,41 +79,42 @@
 ## Implemented Features
 
 ### Core Gameplay
-Two-player cooperative gameplay
-WASD controls for Player 1 (Blue)
-Arrow key controls for Player 2 (Red)
-Wall color permissions (Blue walls for P1, Red walls for P2)
-Three difficulty levels with increasing maze sizes
-Timer system with per-round time limits
-Goal-based round completion
+- Two-player cooperative gameplay
+- WASD controls for Player 1 (Blue)
+- Arrow key controls for Player 2 (Red)
+- Wall color permissions (Blue walls for P1, Red walls for P2)
+- Three difficulty levels with increasing maze sizes
+- Timer system with per-round time limits
+- Goal-based round completion
 
 ### Maze Generation
-Procedural maze generation using Depth-First Search
- Guaranteed solvable mazes
- Random colored wall placement (10% of tiles)
- Proper start and goal positioning
- Difficulty scaling:
-  - Easy: 10x10 grid
-  - Medium: 15x15 grid
-  - Hard: 25x25 grid
+- Procedural maze generation using Depth-First Search
+ - Guaranteed solvable mazes
+ - Random colored wall placement (10% of tiles)
+ - Proper start and goal positioning
+ 
+ - Difficulty scaling:
+   - Easy: 10x10 grid
+   - Medium: 15x15 grid
+   - Hard: 25x25 grid
 
 ### Game Flow
-Main menu with Start/Scoreboard/Exit options
-Team name input (max 20 characters)
-Progressive round system (Easy, Medium, Hard)
-Round completion detection (both players must reach goal)
-Time limit enforcement
-Win condition (complete all 3 rounds)
-Lose condition (time expires)
-Automatic score saving on win
-Return to menu after game end
+- Main menu with Start/Scoreboard/Exit options
+- Team name input (max 20 characters)
+- Progressive round system (Easy, Medium, Hard)
+- Round completion detection (both players must reach goal)
+- Time limit enforcement
+- Win condition (complete all 3 rounds)
+- Lose condition (time expires)
+- Automatic score saving on win
+- Return to menu after game end
 
 ### Database Integration
-MySQL connection via JDBC
-Score persistence
-Top 10 leaderboard
-Automatic timestamp recording
-SQL injection prevention via PreparedStatements
+- MySQL connection via JDBC
+- Score persistence
+- Top 10 leaderboard
+- Automatic timestamp recording
+- SQL injection prevention via PreparedStatements
 
 ### Visual Design
 Color-coded tiles:
@@ -138,16 +139,16 @@ UI Elements:
 
 All SRS requirements implemented:
 
-SRS-MG-001: Maze generation on round start
-SRS-MG-001.1-001.4: Player movement (WASD + Arrows)
-SRS-MG-002: Movement to adjacent empty tiles
-SRS-MG-003: Player-specific wall traversal
-SRS-MG-004: Wall color restrictions
-SRS-MG-005: Timer display and tracking
-SRS-MG-006: Time expiration handling
-SRS-MG-007: Three difficulty levels with progression
-SRS-MG-008: Team name input and score recording
-SRS-MG-009: Database persistence and scoreboard display
+* SRS-MG-001: Maze generation on round start
+* SRS-MG-001.1-001.4: Player movement (WASD + Arrows)
+* SRS-MG-002: Movement to adjacent empty tiles
+* SRS-MG-003: Player-specific wall traversal
+* SRS-MG-004: Wall color restrictions
+* SRS-MG-005: Timer display and tracking
+* SRS-MG-006: Time expiration handling
+* SRS-MG-007: Three difficulty levels with progression
+* SRS-MG-008: Team name input and score recording
+* SRS-MG-009: Database persistence and scoreboard display
 
 ## Technical Implementation
 
@@ -175,12 +176,12 @@ SRS-MG-009: Database persistence and scoreboard display
    - Time limit enforcement
 
 ### Code Quality
-Proper error handling
-SQL injection prevention
-Resource management (DB connections)
-Clear class responsibilities
-Comprehensive documentation
-Follows Java naming conventions
+- Proper error handling
+- SQL injection prevention
+- Resource management (DB connections)
+- Clear class responsibilities
+- Comprehensive documentation
+- Follows Java naming conventions
 
 ## Deliverables
 
@@ -250,19 +251,19 @@ Follows Java naming conventions
 ## Testing Checklist
 
 All test cases from STP document can be verified:
-T-SRS-MG-001: Maze generation
-T-SRS-MG-001.1: Player movement (WASD + Arrows)
-T-SRS-MG-002: Adjacent tile movement
-T-SRS-MG-003: Color-specific wall traversal
-T-SRS-MG-004: Wall color restrictions
-T-SRS-MG-005: Timer tracking and display
-T-SRS-MG-006: Time expiration handling
-T-SRS-MG-007: Difficulty progression
-T-SRS-MG-007.1: Round transitions
-T-SRS-MG-008: Team name input
-T-SRS-MG-008.1: Total time calculation
-T-SRS-MG-009: Database score storage
-T-SRS-MG-009.1: Scoreboard retrieval
+* T-SRS-MG-001: Maze generation
+* T-SRS-MG-001.1: Player movement (WASD + Arrows)
+* T-SRS-MG-002: Adjacent tile movement
+* T-SRS-MG-003: Color-specific wall traversal
+* T-SRS-MG-004: Wall color restrictions
+* T-SRS-MG-005: Timer tracking and display
+* T-SRS-MG-006: Time expiration handling
+* T-SRS-MG-007: Difficulty progression
+* T-SRS-MG-007.1: Round transitions
+* T-SRS-MG-008: Team name input
+* T-SRS-MG-008.1: Total time calculation
+* T-SRS-MG-009: Database score storage
+* T-SRS-MG-009.1: Scoreboard retrieval
 
 ## Additional Features (Beyond Requirements)
 
@@ -301,16 +302,16 @@ The project demonstrates:
 
 ## Project Success Metrics
 
-100% of user requirements implemented
-100% of system requirements implemented
-All backend components complete and functional
-Database layer fully operational
-GUI layer complete with all required interactions
-Maze generation algorithm working correctly
-Player movement and collision detection accurate
-Round progression system functional
-Scoreboard system operational
-Ready for demonstration and testing
+- 100% of user requirements implemented
+- 100% of system requirements implemented
+- All backend components complete and functional
+- Database layer fully operational
+- GUI layer complete with all required interactions
+- Maze generation algorithm working correctly
+- Player movement and collision detection accurate
+- Round progression system functional
+- Scoreboard system operational
+- Ready for demonstration and testing
 
 ---
 
