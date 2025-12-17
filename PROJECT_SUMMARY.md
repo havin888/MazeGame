@@ -24,7 +24,7 @@
 **Controller Layer**
 - GameController.java 
   - Player input handling
-  - Round progression (Easy → Medium → Hard)
+  - Round progression (Easy, Medium, Hard)
   - Timer management
   - Win/lose conditions
   - Score saving
