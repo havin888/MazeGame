@@ -1,0 +1,22 @@
+# MySQL Database Configuration for Maze Game
+
+# Database connection settings
+db.url=jdbc:mysql://localhost:3306/mazegame_db
+db.username=root
+db.password=
+
+# Connection pool settings (optional for future enhancement)
+db.pool.maxConnections=10
+db.pool.minConnections=2
+
+# Game settings
+game.timeLimit=120000
+# Time limit per round in milliseconds (120000 = 2 minutes)
+
+# Maze dimensions
+maze.easy.width=10
+maze.easy.height=10
+maze.medium.width=15
+maze.medium.height=15
+maze.hard.width=25
+maze.hard.height=25
