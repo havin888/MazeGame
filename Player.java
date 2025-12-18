@@ -10,7 +10,6 @@ public class Player {
     public PlayerId getPlayerId() {
         return playerId;
     }
-    
     public void setPlayerId(PlayerId playerId) {
         this.playerId = playerId;
     }
