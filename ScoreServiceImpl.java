@@ -1,15 +1,17 @@
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class ScoreServiceImpl implements ScoreService {
-    private List<ScoreRecord> scores;
     private JDBCConnection dbConnection;
     
     public ScoreServiceImpl() {
-        this.scores = new ArrayList<>();
-        this.dbConnection = null; // Would be initialized with actual connection
+        this.dbConnection = new JDBCConnectionImpl();
+    }
+    
+    public ScoreServiceImpl(JDBCConnection connection) {
+        this.dbConnection = connection;
     }
     
     public JDBCConnection getDbConnection() {
@@ -22,27 +24,77 @@ public class ScoreServiceImpl implements ScoreService {
     
     @Override
     public void saveScore(String teamName, long timeMillis) {
-        ScoreRecord record = new ScoreRecord(teamName, timeMillis);
-        scores.add(record);
-        
-        // Would save to database via dbConnection
-        if (dbConnection != null) {
-            // dbConnection.executeUpdate(sql, params);
+        try {
+            dbConnection.startConnection();
+            
+            String sql = "INSERT INTO SCOREBOARD (team_name, completion_time) VALUES (?, ?)";
+            Object[] params = {teamName, timeMillis};
+            
+            dbConnection.executeUpdate(sql, params);
+            
+            dbConnection.endConnection();
+        } catch (Exception e) {
+            System.err.println("Error saving score: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    @Override
+    public boolean teamNameExists(String teamName) {
+        try {
+            dbConnection.startConnection();
+            
+            String sql = "SELECT COUNT(*) as count FROM SCOREBOARD WHERE team_name = ?";
+            Object[] params = {teamName};
+            ResultSet rs = dbConnection.executeQuery(sql, params);
+            
+            boolean exists = false;
+            if (rs != null && rs.next()) {
+                int count = rs.getInt("count");
+                exists = (count > 0);
+            }
+            
+            if (rs != null) {
+                rs.close();
+            }
+            
+            dbConnection.endConnection();
+            
+            return exists;
+        } catch (Exception e) {
+            System.err.println("Error checking team name: " + e.getMessage());
+            e.printStackTrace();
+            return false;
         }
     }
     
     @Override
     public List<ScoreRecord> getTopScores() {
-        // Sort scores by time (lower is better)
-        Collections.sort(scores, new Comparator<ScoreRecord>() {
-            @Override
-            public int compare(ScoreRecord s1, ScoreRecord s2) {
-                return Long.compare(s1.getTotalTime(), s2.getTotalTime());
-            }
-        });
+        List<ScoreRecord> scores = new ArrayList<>();
         
-        // Return top scores (e.g., top 10)
-        int limit = Math.min(10, scores.size());
-        return new ArrayList<>(scores.subList(0, limit));
+        try {
+            dbConnection.startConnection();
+            
+            String sql = "SELECT team_name, completion_time FROM SCOREBOARD ORDER BY completion_time ASC LIMIT 10";
+            
+            ResultSet rs = dbConnection.executeQuery(sql, null);
+            
+            while (rs != null && rs.next()) {
+                String teamName = rs.getString("team_name");
+                long completionTime = rs.getLong("completion_time");
+                scores.add(new ScoreRecord(teamName, completionTime));
+            }
+            
+            if (rs != null) {
+                rs.close();
+            }
+            
+            dbConnection.endConnection();
+        } catch (Exception e) {
+            System.err.println("Error retrieving scores: " + e.getMessage());
+            e.printStackTrace();
+        }
+        
+        return scores;
     }
 }
