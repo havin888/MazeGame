@@ -1,18 +1,21 @@
 import java.util.List;
+import java.util.ArrayList;
 
 public class GameController {
     private RoundManager roundManager;
     private ScoreService scoreService;
     private Team team;
-    private GameTimer gameTimer;
     private GameState gameState;
+    private DifficultyLevel currentDifficulty;
+    private List<RoundResult> roundResults;
     
     public GameController() {
         this.roundManager = new RoundManager();
         this.scoreService = new ScoreServiceImpl();
         this.team = null;
-        this.gameTimer = new GameTimer();
         this.gameState = GameState.MENU;
+        this.currentDifficulty = DifficultyLevel.EASY;
+        this.roundResults = new ArrayList<>();
     }
     
     public RoundManager getRoundManager() {
@@ -39,14 +42,6 @@ public class GameController {
         this.team = team;
     }
     
-    public GameTimer getGameTimer() {
-        return gameTimer;
-    }
-    
-    public void setGameTimer(GameTimer gameTimer) {
-        this.gameTimer = gameTimer;
-    }
-    
     public GameState getGameState() {
         return gameState;
     }
@@ -55,16 +50,20 @@ public class GameController {
         this.gameState = gameState;
     }
     
-    public void startGame() {
-        if (team == null) {
-            throw new IllegalStateException("Team must be set before starting game");
-        }
+    public DifficultyLevel getCurrentDifficulty() {
+        return currentDifficulty;
+    }
+    
+    public void startGame(String teamName) {
+        this.team = new Team(teamName);
+        this.currentDifficulty = DifficultyLevel.EASY;
+        this.roundResults.clear();
         gameState = GameState.PLAYING;
-        gameTimer.start();
+        roundManager.startRound(currentDifficulty);
     }
     
     public void stopGame() {
-        gameTimer.stop();
+        roundManager.stopRound();
         gameState = GameState.MENU;
     }
     
@@ -86,7 +85,7 @@ public class GameController {
         boolean moved = roundManager.handleMove(playerId, newPos);
         
         // Check if round is complete
-        if (moved && roundManager.isRoundComplete()) {
+        if (roundManager.isRoundComplete()) {
             onRoundComplete();
         }
     }
@@ -114,15 +113,55 @@ public class GameController {
     }
     
     private void onRoundComplete() {
-        gameTimer.stop();
-        long elapsedTime = gameTimer.getElapsedTime();
+        roundManager.stopRound();
+        RoundResult result = roundManager.getRoundResult();
+        roundResults.add(result);
         
         // Add time to team's total
         if (team != null) {
-            team.addRoundTime(elapsedTime);
+            team.addRoundTime(result.getElapsedMillis());
         }
         
-        gameState = GameState.ROUND_COMPLETE;
+        // Check if all rounds are complete
+        if (currentDifficulty == DifficultyLevel.HARD) {
+            gameState = GameState.GAME_OVER;
+        } else {
+            gameState = GameState.ROUND_COMPLETE;
+            // Don't advance difficulty yet - it will be done in startNextRound()
+        }
+    }
+    
+    public void onTimerExpired() {
+        roundManager.stopRound();
+        gameState = GameState.GAME_OVER;
+    }
+    
+    private void advanceDifficulty() {
+        switch (currentDifficulty) {
+            case EASY:
+                currentDifficulty = DifficultyLevel.MEDIUM;
+                break;
+            case MEDIUM:
+                currentDifficulty = DifficultyLevel.HARD;
+                break;
+            case HARD:
+                // Already at max difficulty
+                break;
+        }
+    }
+    
+    public void startNextRound() {
+        if (gameState == GameState.ROUND_COMPLETE) {
+            // Advance difficulty BEFORE starting the next round
+            advanceDifficulty();
+            gameState = GameState.PLAYING;
+            roundManager.startRound(currentDifficulty);
+        }
+    }
+    
+    public long getMaxTimeForDifficulty() {
+        // Time limit in milliseconds (60 seconds = 1 minute per round)
+        return 60000;
     }
     
     public void saveTeamScore(String teamName) {
@@ -133,5 +172,13 @@ public class GameController {
     
     public List<ScoreRecord> getTopScores() {
         return scoreService.getTopScores();
+    }
+    
+    public long calculateTotalTime() {
+        long total = 0;
+        for (RoundResult result : roundResults) {
+            total += result.getElapsedMillis();
+        }
+        return total;
     }
 }
