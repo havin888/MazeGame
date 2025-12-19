@@ -77,6 +77,28 @@ public class MazeGameGUI extends JFrame {
             return;
         }
         
+        // Check if team name already exists in database
+        try {
+            boolean exists = gameController.getScoreService().teamNameExists(teamName);
+            if (exists) {
+                JOptionPane.showMessageDialog(
+                    this,
+                    "Team name '" + teamName + "' already exists!\nPlease choose a different name.",
+                    "Duplicate Team Name",
+                    JOptionPane.WARNING_MESSAGE
+                );
+                return;
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(
+                this,
+                "Error checking team name: " + e.getMessage(),
+                "Database Error",
+                JOptionPane.ERROR_MESSAGE
+            );
+            return;
+        }
+        
         gameController.startGame(teamName);
         showGameScreen();
     }
@@ -105,19 +127,31 @@ public class MazeGameGUI extends JFrame {
         
         add(infoPanel, BorderLayout.NORTH);
         
+        // Maze panel
         mazePanel = new MazePanel(gameController);
         add(mazePanel, BorderLayout.CENTER);
+        
+        // Add key listener with key press tracking to prevent multiple moves
+        final boolean[] keyPressed = new boolean[1];
         addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
-                handleKeyPress(e);
+                if (!keyPressed[0]) {
+                    keyPressed[0] = true;
+                    handleKeyPress(e);
+                }
+            }
+            
+            @Override
+            public void keyReleased(KeyEvent e) {
+                keyPressed[0] = false;
             }
         });
         
         setFocusable(true);
         requestFocusInWindow();
-
-        //game starts
+        
+        // Start game timer for UI updates
         gameTimer = new Timer(100, e -> updateGameState());
         gameTimer.start();
         
@@ -174,9 +208,20 @@ public class MazeGameGUI extends JFrame {
     }
     
     private void updateGameState() {
-        // updates timer display
+        // Update timer display
         long elapsed = gameController.getRoundManager().getTimer().getElapsedTime() / 1000;
-        timerLabel.setText("Time: " + elapsed + "s");
+        long timeLimit = gameController.getMaxTimeForDifficulty() / 1000;
+        long remaining = timeLimit - elapsed;
+        
+        if (remaining < 0) remaining = 0;
+        
+        timerLabel.setText("Time: " + remaining + "s");
+        
+        // Check if time expired
+        if (remaining <= 0 && !gameController.getRoundManager().isRoundComplete()) {
+            gameTimer.stop();
+            gameController.onTimerExpired();
+        }
         
         GameState state = gameController.getGameState();
         
@@ -186,8 +231,8 @@ public class MazeGameGUI extends JFrame {
         } else if (state == GameState.GAME_OVER) {
             gameTimer.stop();
             
-            if (gameController.getCurrentDifficulty() == DifficultyLevel.HARD && 
-                gameController.getRoundManager().isRoundComplete()) {
+            if (gameController.getRoundManager().isRoundComplete() && 
+                gameController.getCurrentDifficulty() == DifficultyLevel.HARD) {
                 showYouWin();
             } else {
                 showYouLose();
@@ -196,9 +241,12 @@ public class MazeGameGUI extends JFrame {
     }
     
     private void showRoundComplete() {
+        // Get the difficulty that was JUST completed
+        String completedRoundName = getRoundName();
+        
         int result = JOptionPane.showConfirmDialog(
             this,
-            "Round " + getRoundName() + " Complete!\nReady for next round?",
+            "Round " + completedRoundName + " Complete!\nReady for next round?",
             "Round Complete",
             JOptionPane.OK_CANCEL_OPTION
         );
@@ -223,10 +271,13 @@ public class MazeGameGUI extends JFrame {
             JOptionPane.INFORMATION_MESSAGE
         );
         
-        // saves score
-        gameController.saveTeamScore(gameController.getTeam().getTeamName());
+        // Save score (team name was already validated before game started)
+        if (gameController.getTeam() != null) {
+            gameController.saveTeamScore(gameController.getTeam().getTeamName());
+        }
         
-        showMainMenu();
+        // Show scoreboard BEFORE returning to main menu
+        showScoreboard();
     }
     
     private void showYouLose() {
