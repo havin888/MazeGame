@@ -25,10 +25,11 @@ public class MazePanel extends JPanel {
         int width = maze.getWidth();
         int height = maze.getHeight();
         
+        // Calculate offset to center the maze
         int offsetX = (getWidth() - width * CELL_SIZE) / 2;
         int offsetY = (getHeight() - height * CELL_SIZE) / 2;
         
-        // draws maze
+        // Draw maze
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 Tile tile = maze.getTile(x, y);
@@ -38,7 +39,7 @@ public class MazePanel extends JPanel {
             }
         }
         
-        // draws players
+        // Draw players
         if (players != null) {
             PlayerState p1 = players.get(PlayerId.PLAYER_1);
             if (p1 != null) {
@@ -79,7 +80,7 @@ public class MazePanel extends JPanel {
             case GOAL:
                 g.setColor(Color.GREEN);
                 g.fillRect(x, y, CELL_SIZE, CELL_SIZE);
-                // draws star pattern for goal
+                // Draw star pattern for goal
                 g.setColor(Color.YELLOW);
                 int cx = x + CELL_SIZE / 2;
                 int cy = y + CELL_SIZE / 2;
@@ -88,7 +89,7 @@ public class MazePanel extends JPanel {
                 break;
         }
         
-        // draws grid border
+        // Draw grid border
         g.setColor(Color.BLACK);
         g.drawRect(x, y, CELL_SIZE, CELL_SIZE);
     }
@@ -98,15 +99,15 @@ public class MazePanel extends JPanel {
         int x = offsetX + pos.getX() * CELL_SIZE;
         int y = offsetY + pos.getY() * CELL_SIZE;
         
-        // draws player as a circle
+        // Draw player as a circle
         g.setColor(color);
         g.fillOval(x + 3, y + 3, CELL_SIZE - 6, CELL_SIZE - 6);
         
-        // draws outline
+        // Draw outline
         g.setColor(Color.BLACK);
         g.drawOval(x + 3, y + 3, CELL_SIZE - 6, CELL_SIZE - 6);
         
-        // if player reached goal, draw a checkmark
+        // If player reached goal, draw a checkmark
         if (playerState.hasReachedGoal()) {
             g.setColor(Color.GREEN);
             g.setFont(new Font("Arial", Font.BOLD, 12));

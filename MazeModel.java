@@ -35,7 +35,7 @@ public class MazeModel {
     
     public void setDifficulty(DifficultyLevel difficulty) {
         this.difficulty = difficulty;
-        // set dimensions based on dificulty
+        // Set dimensions based on difficulty
         switch (difficulty) {
             case EASY:
                 this.width = 10;
@@ -88,14 +88,14 @@ public class MazeModel {
         tiles.clear();
         Random random = new Random();
         
-        // initialize all tiles as regular walls
+        // Initialize all tiles as regular walls
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 tiles.put(new Position(x, y), new RegularWall(new Position(x, y)));
             }
         }
         
-        // using DFS to carve paths
+        // Use DFS to carve paths
         Stack<Position> stack = new Stack<>();
         Position start = new Position(1, 1);
         tiles.put(start, new Floor(start));
@@ -135,13 +135,19 @@ public class MazeModel {
             }
         }
         
+        // Set start positions (both players start at same location)
         player1Start = new Position(1, 1);
         player2Start = new Position(1, 1);
         
+        // Set goal position - MUST be on a floor tile
         goalPosition = new Position(width - 2, height - 2);
         
+        // CRITICAL FIX: Ensure goal tile is a FLOOR tile, not a wall
+        // This guarantees both players can reach it
         tiles.put(goalPosition, new Floor(goalPosition));
         
+        // Create a path to goal if needed - ensure tiles around goal are accessible
+        // Clear area around goal to ensure accessibility
         for (int dgy = -1; dgy <= 1; dgy++) {
             for (int dgx = -1; dgx <= 1; dgx++) {
                 int gx = goalPosition.getX() + dgx;
@@ -149,7 +155,7 @@ public class MazeModel {
                 if (gx > 0 && gx < width - 1 && gy > 0 && gy < height - 1) {
                     Position pos = new Position(gx, gy);
                     Tile tile = getTile(gx, gy);
-                    // only convert to floor if it's a regular wall
+                    // Only convert to floor if it's a regular wall
                     if (tile instanceof RegularWall) {
                         tiles.put(pos, new Floor(pos));
                     }
@@ -157,7 +163,8 @@ public class MazeModel {
             }
         }
         
-        int coloredWallCount = (int) (width * height * 0.08); // reduced from 0.1
+        // Now add colored walls, but NEVER near the goal or start
+        int coloredWallCount = (int) (width * height * 0.08); // Reduced from 0.1
         int attempts = 0;
         int maxAttempts = coloredWallCount * 10;
         
@@ -168,9 +175,11 @@ public class MazeModel {
             Position pos = new Position(x, y);
             Tile tile = getTile(x, y);
             
+            // Don't place colored walls near start or goal
             int distToStart = Math.abs(x - player1Start.getX()) + Math.abs(y - player1Start.getY());
             int distToGoal = Math.abs(x - goalPosition.getX()) + Math.abs(y - goalPosition.getY());
             
+            // Only place colored walls on regular walls, and not too close to start/goal
             if (tile instanceof RegularWall && distToStart > 3 && distToGoal > 3) {
                 if (random.nextBoolean()) {
                     tiles.put(pos, new BlueWall(pos));
@@ -181,7 +190,8 @@ public class MazeModel {
             }
         }
         
-        // creates a special goal tile
+        // Final step: Mark the goal tile with GOAL type (but it's still passable by both)
+        // Create a special goal tile
         Tile goalTile = new Tile(goalPosition, TileType.GOAL);
         tiles.put(goalPosition, goalTile);
     }
