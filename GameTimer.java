@@ -33,9 +33,6 @@ public class GameTimer {
     }
     
     public long getElapsedTime() {
-        if (!isRunning) {
-            return 0;
-        }
         return System.currentTimeMillis() - startTime;
     }
 }

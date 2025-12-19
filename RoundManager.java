@@ -39,19 +39,24 @@ public class RoundManager {
     }
     
     public void startRound(DifficultyLevel difficulty) {
+        // Set difficulty and generate maze
         maze.setDifficulty(difficulty);
         maze.generateMaze();
-
+        
+        // Reset player states
         players.clear();
-
+        
+        // Initialize player 1
         Player player1 = new Player(PlayerId.PLAYER_1, WallColor.BLUE);
         PlayerState ps1 = new PlayerState(player1, new Position(maze.getPlayer1Start().getX(), maze.getPlayer1Start().getY()));
         players.put(PlayerId.PLAYER_1, ps1);
-
+        
+        // Initialize player 2
         Player player2 = new Player(PlayerId.PLAYER_2, WallColor.RED);
         PlayerState ps2 = new PlayerState(player2, new Position(maze.getPlayer2Start().getX(), maze.getPlayer2Start().getY()));
         players.put(PlayerId.PLAYER_2, ps2);
-
+        
+        // Start timer
         timer.start();
         currentRound++;
     }
@@ -61,7 +66,8 @@ public class RoundManager {
         if (playerState == null) {
             return false;
         }
-
+        
+        // Check if the move is valid
         if (maze.isWalkable(playerId, newPos.getX(), newPos.getY())) {
             playerState.setPosition(newPos);
             
