@@ -7,7 +7,7 @@ import static org.junit.Assert.*;
  * Verifies: SRS-MG-005, SRS-MG-005.1, SRS-MG-006, SRS-MG-006.1
  * Description: Verify timer tracking and time expiration handling
  */
-public class TimerFunctionalityTest {
+public class TimerFunctualityTest {
     private GameController gameController;
     private GameTimer timer;
 

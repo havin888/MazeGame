@@ -1,0 +1,15 @@
+# IntelliJ / IDE files
+.idea/
+*.iml
+
+# Database credentials
+database.properties
+
+# Build outputs
+*.class
+out/
+target/
+lib/*.jar
+.idea/
+
+

@@ -66,8 +66,7 @@ public class GameController {
         roundManager.stopRound();
         gameState = GameState.MENU;
     }
-
-    //Check comments for test ideas
+    
     public void onPlayerInput(PlayerId playerId, Direction direction) {
         if (gameState != GameState.PLAYING) {
             return;
